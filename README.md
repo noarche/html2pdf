@@ -4,6 +4,7 @@ This tool is handy for automating batch HTML-to-PDF conversions, especially when
 
 This script converts all .html files in a user-specified directory into .pdf format, simulating the behavior of printing the web pages from a browser. It uses wkhtmltopdf and the pdfkit library for this conversion process.
 
+![html2pdf](https://github.com/user-attachments/assets/7b4c3207-2919-433b-bfa4-a02bcd29296d)
 
 # ꧁꧂  How to run
 
