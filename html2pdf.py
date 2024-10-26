@@ -3,6 +3,7 @@ import pdfkit
 import colorama
 from colorama import Fore, Style
 from tqdm import tqdm
+from datetime import datetime
 
 colorama.init(autoreset=True)
 
@@ -28,7 +29,7 @@ def format_size(size_in_bytes):
         i += 1
     return f"{size_in_bytes:.2f} {size_units[i]}"
 
-def process_directory(directory):
+def process_directory(directory, output_directory):
     """Process all HTML files in the directory and convert them to PDF."""
     html_files = [f for f in os.listdir(directory) if f.endswith('.html')]
     total_files = len(html_files)
@@ -41,10 +42,14 @@ def process_directory(directory):
 
     print(f"{Fore.CYAN}Converting {total_files} HTML files to PDF...")
 
+    # Create output directory if it doesn't exist
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+
     # Process each HTML file and convert to PDF
     for html_file in tqdm(html_files, desc="Progress", unit="file", colour="green"):
         html_path = os.path.join(directory, html_file)
-        pdf_file = os.path.splitext(html_path)[0] + '.pdf'
+        pdf_file = os.path.join(output_directory, os.path.splitext(html_file)[0] + '.pdf')
         pdf_size = convert_html_to_pdf(html_path, pdf_file)
         if pdf_size > 0:
             total_pdf_size += pdf_size
@@ -57,7 +62,7 @@ def process_directory(directory):
 
 def main():
     while True:
-        # Prompt user for directory
+        # Prompt user for the directory containing HTML files
         directory = input(f"{Fore.MAGENTA}Enter the directory containing HTML files (or type 'e'/'exit' to quit): {Style.BRIGHT}")
         
         if directory.lower() in ['e', 'exit']:
@@ -67,9 +72,17 @@ def main():
         if not os.path.isdir(directory):
             print(f"{Fore.RED}Invalid directory. Please try again.")
             continue
+
+        # Prompt user for the output directory
+        default_output_dir = f"./{os.path.basename(directory)}_{datetime.now().strftime('%Y%m%d')}/"
+        output_directory = input(f"{Fore.MAGENTA}Enter the output directory for PDF files (leave blank to use '{default_output_dir}'): {Style.BRIGHT}")
+        
+        # Use the default output directory if the input is blank
+        if not output_directory.strip():
+            output_directory = default_output_dir
         
         # Process the directory
-        process_directory(directory)
+        process_directory(directory, output_directory)
         
         # Ask if the user wants to process another directory
         again = input(f"{Fore.CYAN}Do you want to process another directory? (y/n): {Style.BRIGHT}")
